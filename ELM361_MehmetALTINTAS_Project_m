@@ -1,0 +1,426 @@
+% Mehmet ALTINTAŞ - 1901022065
+% ELEC 361 PROJE - PROBLEM A
+
+% Parameters
+f1 = 150; % Hz
+f2 = 250; % Hz
+A1 = 8;
+A2 = 10;
+
+% Fundamental period to show one cycle of the combined waveform
+T = 1/50;  % 0.02 s
+Fs = 10000; % Sampling frequency (high enough to capture frequencies)
+t = 0:1/Fs:T-1/Fs; 
+
+% Message signal
+m = A1*cos(2*pi*f1*t) + A2*sin(2*pi*f2*t);
+
+% Plot the time-domain signal
+figure;
+plot(t, m, 'LineWidth', 1.5);
+xlabel('Time (s)');
+ylabel('Amplitude');
+title('Message Signal in Time domain m(t) / Mehmet ALTINTAŞ - 1901022065');
+grid on;
+
+% Compute the Fourier Transform (using FFT)
+N = length(m);
+M = fft(m);   % Discrete Fourier Transform
+M_mag = abs(M)/N;  % Normalize the magnitude
+
+% Frequency axis for plotting (two-sided)
+f_axis = (-N/2:N/2-1)*(Fs/N);
+
+% Shift FFT for plotting
+M_mag_shifted = fftshift(M_mag);
+
+% Define a threshold to remove near-zero amplitudes
+threshold = 1e-3; % Adjust this value as needed
+
+% Identify indices where magnitude is above the threshold
+nonzero_indices = M_mag_shifted > threshold;
+
+% Filter the frequency axis and magnitude spectrum
+f_axis_nonzero = f_axis(nonzero_indices);
+M_mag_nonzero = M_mag_shifted(nonzero_indices);
+
+% Plot the magnitude spectrum (two-sided) 
+figure;
+stem(f_axis_nonzero, M_mag_nonzero, '^', 'LineWidth', 1.5);
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+title('Message Signal in Frequency Domain M(f) / Mehmet ALTINTAŞ - 1901022065');
+xlim([-300 300]); % Focus around the expected frequency lines
+grid on;
+
+
+
+% Mehmet ALTINTAŞ - 1901022065
+% ELEC 361 PROJE - PROBLEM B - OPTION I
+
+% Parameters
+f1 = 150;    % Message frequency 1 in Hz
+f2 = 250;    % Message frequency 2 in Hz
+A1 = 8;      % Amplitude of the first cosine in m(t)
+A2 = 10;     % Amplitude of the second sine in m(t)
+
+fc = 1500;   % Carrier frequency in Hz
+Ac = 10;     % Carrier amplitude
+
+% Time parameters
+T = 1/50;                   % Fundamental period to capture all components (0.02 s)
+Fs = 100000;                % Sampling frequency for better frequency resolution
+t = 0:1/Fs:T-1/Fs;          % Time vector
+
+% Message signal
+m = A1*cos(2*pi*f1*t) + A2*sin(2*pi*f2*t);
+
+% Carrier signal
+c = Ac*cos(2*pi*fc*t);
+
+% DSB-SC modulated signal
+y = m .* c;
+
+% Plot time-domain signal
+figure;
+plot(t, y, 'LineWidth', 1.5);
+xlabel('Time (s)');
+ylabel('Amplitude');
+title('DSB-SC Modulated Signal in Time Domain y(t) / Mehmet ALTINTAŞ - 1901022065');
+grid on;
+
+% Compute spectrum via FFT
+N = length(y);
+Y = fft(y);
+Y_mag = abs(Y)/N;           % Normalize the magnitude
+
+% Frequency axis for plotting (two-sided)
+f_axis = (-N/2:N/2-1)*(Fs/N);
+
+% Shift FFT for plotting
+Y_mag_shifted = fftshift(Y_mag);
+
+% Define a threshold to remove near-zero amplitudes
+threshold = 1e-3;            % Adjust this value as needed
+
+% Identify indices where magnitude is above the threshold
+nonzero_indices = Y_mag_shifted > threshold;
+
+% Filter the frequency axis and magnitude spectrum
+f_axis_nonzero = f_axis(nonzero_indices);
+Y_mag_nonzero = Y_mag_shifted(nonzero_indices);
+
+% Plot the magnitude spectrum (two-sided) 
+figure;
+stem(f_axis_nonzero, Y_mag_nonzero, '^', 'LineWidth', 1.5);
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+title(' DSB-SC Modulated Signal in Frequency Domain Y(f) / Mehmet ALTINTAŞ - 1901022065');
+xlim([-2000 2000]);           % Focus on frequencies up to ±2000 Hz
+grid on;
+
+
+
+% Mehmet ALTINTAŞ - 1901022065
+% ELEC 361 PROJE - PROBLEM B - OPTION II
+
+% Parameters
+f1 = 150;     % Message frequency 1 in Hz
+f2 = 250;     % Message frequency 2 in Hz
+A1 = 8;       % Amplitude for cos(2*pi*150*t)
+A2 = 10;      % Amplitude for sin(2*pi*250*t)
+
+fc = 1500;    % Carrier frequency in Hz
+Ac = 10;      % Carrier amplitude
+
+% Time settings
+T = 1/50;         % One period of the combined baseband signal (0.02 s)
+Fs = 100000;      % High sampling rate for better resolution (100 kHz)
+t = 0:1/Fs:T-1/Fs; % Time vector
+
+% Message and carrier signals
+m = (A1*cos(2*pi*f1*t) + A2*sin(2*pi*f2*t)); % Message signal
+c = Ac*cos(2*pi*fc*t);                      % Carrier signal
+
+% DSB-SC Modulated signal
+y = m .* c;
+
+% Demodulator carrier
+c_hat = cos(2*pi*1500*t); % Given as cos(3000*pi*t)
+
+% Signal at the input of LPF (mixer output)
+e = y .* c_hat;
+
+% Plot the time-domain signal at LPF input
+figure;
+plot(t, e, 'LineWidth', 1.5);
+xlabel('Time (s)');
+ylabel('Amplitude');
+title('Demodulated Signal In Time Domain e(t) / Mehmet ALTINTAŞ - 1901022065');
+grid on;
+
+% Compute spectrum via FFT
+N = length(e);
+E = fft(e);
+E_mag = abs(E)/N;           % Normalize the magnitude
+
+% Frequency axis for plotting (two-sided)
+f_axis = (-N/2:N/2-1)*(Fs/N);
+
+% Shift FFT for plotting
+E_mag_shifted = fftshift(E_mag);
+
+% Define a threshold to remove near-zero amplitudes
+threshold = 1e-3;            
+
+% Identify indices where magnitude is above the threshold
+nonzero_indices = E_mag_shifted > threshold;
+
+% Filter the frequency axis and magnitude spectrum
+f_axis_nonzero = f_axis(nonzero_indices);
+E_mag_nonzero = E_mag_shifted(nonzero_indices);
+
+% Plot the magnitude spectrum (two-sided)
+figure;
+stem(f_axis_nonzero, E_mag_nonzero, '^', 'LineWidth', 1.5);
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+title('Demodulated Signal In Frequency Domain E(f) / Mehmet ALTINTAŞ - 1901022065');
+xlim([-3500 3500]);          % Focus on frequencies up to ±3500 Hz
+grid on;
+
+
+
+
+% Mehmet ALTINTAŞ - 1901022065
+% ELEC 361 PROJE - PROBLEM B - OPTION III
+
+% Parameters
+f1 = 150;    % Hz (message frequency 1)
+f2 = 250;    % Hz (message frequency 2)
+A1 = 8;
+A2 = 10;
+
+fc = 1500;   % carrier frequency
+Ac = 10;     % carrier amplitude
+
+% Time settings
+T = 1/50;    % One period
+Fs = 100000; % Sampling frequency
+t = 0:1/Fs:T-1/Fs;
+
+% Message signal
+m = A1*cos(2*pi*f1*t) + A2*sin(2*pi*f2*t);
+
+% DSB-SC modulation
+c = Ac*cos(2*pi*fc*t);
+y = m .* c; % DSB-SC modulated signal
+
+% Demodulator carrier
+c_hat = cos(2*pi*fc*t);
+
+% Signal at the input of LPF (mixer output)
+e = y .* c_hat;
+
+% Frequency-domain low-pass filter
+% --------------------------------
+% Define cutoff frequency
+f_cutoff = 500; % in Hz
+
+N = length(e);
+E = fft(e);
+f_axis = (0:N-1)*(Fs/N);  % frequency axis from 0 to Fs-Δf
+
+% Shift frequency axis to range [-Fs/2, Fs/2)
+f_axis_shifted = f_axis - Fs*(f_axis >= Fs/2);
+
+% Find indices that correspond to frequencies outside the low-pass band
+low_pass_indices = abs(f_axis_shifted) <= f_cutoff;
+
+% Construct a filter mask
+H = zeros(size(E));
+H(low_pass_indices) = 1;  % 1 inside cutoff, 0 outside
+
+% Apply filter
+E_filtered = E .* H;
+
+% Reconstruct time-domain signal
+z = ifft(E_filtered, 'symmetric');
+
+% Plot the time-domain output of LPF
+figure;
+plot(t, z, 'LineWidth', 1.5);
+xlabel('Time (s)');
+ylabel('Amplitude');
+title('Output of the LPF z(t) / Mehmet ALTINTAŞ - 1901022065');
+grid on;
+
+% Compute and plot the spectrum of z(t)
+Z_fft = fft(z);
+Z_mag = abs(Z_fft)/N;
+f_axis_plot = (-N/2:N/2-1)*(Fs/N);
+Z_mag_shifted = fftshift(Z_mag);
+
+% Define frequencies to keep and tolerance
+keep_freqs = [-250, -150, 150, 250]; % in Hz
+tol = 10; % tolerance in Hz
+
+% Initialize mask
+mask = false(size(f_axis_plot));
+
+% Create mask for desired frequencies within the tolerance
+for k = 1:length(keep_freqs)
+    mask = mask | (abs(f_axis_plot - keep_freqs(k)) <= tol);
+end
+
+% Apply mask to the magnitude spectrum
+Z_mag_shifted_filtered = Z_mag_shifted .* mask;
+
+% **Remove zero amplitude values from the plot**
+% Find indices where magnitude is greater than zero
+nonzero_indices = Z_mag_shifted_filtered > 0;
+
+% Extract only the non-zero frequency components
+f_nonzero = f_axis_plot(nonzero_indices);
+Z_nonzero = Z_mag_shifted_filtered(nonzero_indices);
+
+% Plot the filtered spectrum with only the selected frequencies
+figure;
+stem(f_nonzero, Z_nonzero, '^', 'LineWidth', 1.5);
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+title('Output of LPF Spectrum Z(f)  / Mehmet ALTINTAŞ - 1901022065');
+xlim([-300 300]); % Focus on low frequencies
+grid on;
+
+
+
+
+% Mehmet ALTINTAŞ - 1901022065
+% ELEC 361 PROJE - PROBLEM C - OPTION I
+
+% Parameters
+f1 = 150;    % Hz (message frequency 1)
+f2 = 250;    % Hz (message frequency 2)
+A1 = 8;      % Amplitude of cos(2*pi*150*t)
+A2 = 10;     % Amplitude of sin(2*pi*250*t)
+u = 0.7;     % The modulation index 𝜇
+mp = 18;     % Peek value
+m = 8*cos(2*pi*150*t) + 10*sin(2*pi*250*t); % Message signal m(t)
+m_n =m ./mp; % Normalized signal
+
+fc = 1500;   % Carrier frequency in Hz
+Ac = 10;     % Carrier amplitude
+
+% Time settings
+T = 1/50;             % One period that includes multiple cycles of both tones (0.02 seconds)
+Fs = 100000;          % Sampling frequency (100 kHz)
+t = 0:1/Fs:T-1/Fs;    % Time vector
+
+
+
+% Construct y(t) with specified frequency components
+y = Ac .* (1+u.*m_n) .* cos(2*pi*fc*t);
+
+% Plot y(t) in the time domain
+figure;
+plot(t, y, 'LineWidth', 1.5);
+xlabel('Time (s)');
+ylabel('Amplitude');
+title('DSB-LC Modulated Signal in Time Domain y(t) / Mehmet ALTINTAŞ - 1901022065');
+
+grid on;
+
+% Compute Spectrum via FFT
+N = length(y);
+Y = fft(y);
+Y_mag = abs(Y)/N;                % Normalize the magnitude
+
+% Frequency axis for two-sided spectrum
+f_axis = (-N/2:N/2-1)*(Fs/N);
+
+% Shift FFT for plotting
+Y_mag_shifted = fftshift(Y_mag);
+
+% Define a threshold to remove near-zero amplitudes
+threshold = 1e-3;                % Adjust this value as needed
+
+% Identify indices where magnitude is above the threshold
+nonzero_indices = Y_mag_shifted > threshold;
+
+% Filter the frequency axis and magnitude spectrum
+f_axis_nonzero = f_axis(nonzero_indices);
+Y_mag_nonzero = Y_mag_shifted(nonzero_indices);
+
+% Plot the magnitude spectrum 
+figure;
+stem(f_axis_nonzero, Y_mag_nonzero, '^', 'LineWidth', 1.5);
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+title('DSB-LC Modulated Signal in Frequency Domain Y(f) / Mehmet ALTINTAŞ - 1901022065');
+xlim([-2000 2000]);               % Focus on the relevant frequency range
+grid on;
+
+
+
+
+
+% Mehmet ALTINTAŞ - 1901022065
+% ELEC 361 PROJE - PROBLEM C - OPTION II
+
+% Parameters
+Fs = 100000; % Sampling frequency
+T = 1/50;    % Duration: one period that includes both message frequencies cycles
+t = 0:1/Fs:T-1/Fs;
+
+% Given AM signal parameters
+A_c = 10;
+A_side = 28/18; % ~1.5556
+A_side2 = 35/18; % ~1.9444
+
+fc = 1500;
+f_lower1 = 1350; % fc - 150
+f_upper1 = 1650; % fc + 150
+f_lower2 = 1250; % fc - 250
+f_upper2 = 1750; % fc + 250
+
+% Construct y(t)
+y = A_c*cos(2*pi*fc*t) ...
+  + A_side*cos(2*pi*f_lower1*t) ...
+  + A_side*cos(2*pi*f_upper1*t) ...
+  + A_side2*sin(2*pi*f_upper2*t) ...
+  - A_side2*sin(2*pi*f_lower2*t);
+
+% Full-wave rectification
+rect_y = abs(y);
+
+% FFT of the rectified signal
+N = length(rect_y);
+Y_rect = fft(rect_y);
+f_axis = (0:N-1)*(Fs/N); 
+
+% Define cutoff frequency for LPF
+% The highest message frequency is 250 Hz, so choose a cutoff safely above that
+f_cutoff = 500; % Hz
+
+% Create a low-pass filter mask in frequency domain
+% Pass frequencies <= f_cutoff and also the mirrored part near Fs-f_cutoff
+H = double(f_axis <= f_cutoff) + double(f_axis >= (Fs - f_cutoff));
+
+% Apply the low-pass filter
+Y_filtered = Y_rect .* H;
+
+% Inverse FFT to obtain the smooth envelope
+envelope = ifft(Y_filtered, 'symmetric');
+
+% Remove DC offset
+DC_level = mean(envelope);
+demodulated = envelope - DC_level;
+
+% Plot the demodulated signal
+figure;
+plot(t, demodulated, 'LineWidth', 1.5);
+xlabel('Time (s)');
+ylabel('Amplitude');
+title('Demodulated Signal (Envelope - DC) / Mehmet ALTINTAŞ - 1901022065');
+grid on;
